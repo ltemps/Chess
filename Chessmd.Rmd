@@ -1,0 +1,69 @@
+---
+title: "The impact of Opening Moves"
+author: "Lauren Temple"
+date: "12/9/2021"
+output: 
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(readr, readxl, dplyr, tidyverse, ggplot2, lmerTest, gvlma)
+```
+
+## Abstract
+
+Chess is a strategy and tactic based board game played between two players. It is one of the world's most popular games and is played by millions of people worldwide. The opening move is a topic that has books devoted to it and names for each particular movement pattern. 
+
+Raise the general question
+State how I addressed it and what the overall results are
+
+## Introduction
+
+introduce chess and the question at hand
+
+I use multilevel models to examine the affects that an opening move has on a chess match. This report aims to answer the following questions; does opening move have an affect on the total number of moves; does the opening move have an affect on the duration of the game; and does the Elo of the white player have an affect on opening move choice? 
+
+## Methods
+
+### Data Cleaning and Processing
+
+The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. First, I removed columns that were not of interest to my analysis. Second, I filtered the matches by time to only include those classified as bullet (<= 179s) or blitz (<= 479s), using dplyr. Third, I filtered the matches by player Elo rating, keeping only those where both partner had a rating of at least 2000. This Elo rating is categorized as a strong expert and is in the highest tier. Lastly, I removed matches that ended in a draw. The cleaned data set contains 310,734 observations of 8 variables.
+
+Definition of columns:
+
+| column names      | explanation |
+| :--:              | :----- |
+| WhiteElo          | Elo* of the player with white pieces|
+| BlackElo          | Elo* of the player with black pieces |
+| Winner            | Color of the winning pieces |
+| Termination       | How the game ended, it can be: Normal, Time Forfeit, Abandon or Rules infraction |
+| Year              | Year when the game was played |
+| TimeControl       | Classification of the games based on the estimated duration of a game|
+| Opening           | Opening Move Name|
+| Number of Moves   | Number of moves of the game|
+
+*Elo is a rating system that measures the relative strength of a player
+** Time Control is calculated as InitialTime+ 40*Increment and has 
+
+```{r}
+ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
+  labs(title= "Opening move & Number of Moves", 
+       x= "Opening Move", y= "Number of Moves")
+```
+
+
+```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="captoin of visualization"}
+ggplot(Chess) +
+  aes(x= Opening, y= Number_of_Moves) +
+  geom_point(aes(color= Opening), alpha = 0.3) +
+  labs(title= "Opening move & Number of Moves", 
+       x= "Opening Move", y= "Number of Moves") +
+  geom_smooth(method = "lm", se=FALSE) + theme(legend.position="none")
+```
+
+
+## Citations
+
+Elo Rating System - Chess Terms. (n.d.). Chess.Com. https://www.chess.com/terms/elo-rating-chess
+Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikipedia.org/wiki/Chess
