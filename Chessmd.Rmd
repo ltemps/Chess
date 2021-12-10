@@ -8,7 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(readr, readxl, dplyr, tidyverse, ggplot2, lmerTest, gvlma, plotly)
+pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, ggplot2, lmerTest, gvlma, plotly)
 ```
 
 ## Abstract
@@ -46,27 +46,53 @@ Definition of columns:
 *Elo is a rating system that measures the relative strength of a player
 ** Time Control is calculated as InitialTime+ 40*Increment and has 
 
-```{r}
-open_plot <- ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..))
-#change orientation of labels
+### Exploratory Data Analysis
+
+```{r, include= FALSE}
+source("Data_Wrangling.R")
 ```
 
+```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
+ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..)) +
+  labs(title= "Opening move Frequency", 
+       x= "Opening Move", y= "Frequency") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
 
-```{r}
+```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
 ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
   labs(title= "Opening move & Number of Moves", 
-       x= "Opening Move", y= "Number of Moves")
+       x= "Opening Move", y= "Number of Moves") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-
-```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="captoin of visualization"}
-ggplot(Chess) +
-  aes(x= Opening, y= Number_of_Moves) +
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
+ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_point(aes(color= Opening), alpha = 0.3) +
   labs(title= "Opening move & Number of Moves", 
-       x= "Opening Move", y= "Number of Moves") +
-  geom_smooth(method = "lm", se=FALSE) + theme(legend.position="none")
+       x= "White Elo Rating", y= "Number of Moves") +
+  geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
+
+# Testing Models (remove title later)
+Does opening move have an affect on the total number of moves? 
+Does the opening move have an affect on the TimeControl?
+Does WhiteElo have an affect on opening move choice?
+
+Does opening move have an affect on the number of moves?
+Control for the timecontrol?
+```{r}
+m_2 <- lmer(Number_of_Moves ~ Opening + (1 | TimeControl) + 
+              (1 | Opening:TimeControl), Chess)
+summary(m_2)
+```
+```{r}
+m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + 
+              (1 | Opening:WhiteElo), Chess)
+summary(m_3)
+```
+
+
 
 
 ## Citations

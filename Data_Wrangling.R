@@ -1,6 +1,6 @@
 #Data Wrangling
 
-pacman::p_load(readr, readxl, plyr, dplyr, tidyverse, ggplot2)
+pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, ggplot2)
 
 Chess <- read_csv("Lichess_2013_2014_Complete.csv")
 #remove unwanted columns
@@ -18,9 +18,12 @@ Chess$Opening <- Open1
 #Look at which openings are most frequently occuring in the data set
 open_freq <- tibble(count(Chess, 'Opening'))
 #Choose to do analysis on the top ten
-top_ten <- tibble(count(Chess, 'Opening')) %>% filter(freq >= 9000)
+head(open_freq)
+top_ten <- open_freq %>% dplyr::filter(open_freq$freq > 9000)
+#top_ten <- tibble(count(Chess, 'Opening')) %>% filter(freq >= 9000)
 #Subset data set to only include top ten opening moves
 Chess <- semi_join(Chess, top_ten, by = "Opening")
+
 
 # Questions: 
 # Does opening move have an affect on the total number of moves? 
