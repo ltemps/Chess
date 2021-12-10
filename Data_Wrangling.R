@@ -11,8 +11,6 @@ Chess <- filter(Chess, TimeControl != "Rapid")
 #filter for rating > 2000
 Chess <- filter(Chess, WhiteElo >= 2000)
 Chess <- filter(Chess, BlackElo >= 2000)
-#remove winner = draw
-Chess <- filter(Chess, Winner != "Draw")
 #Simplify Opening Move
 Open <- str_split_fixed(Chess$Opening, ":", 2)
 Open1 <- Open [ ,(1)]

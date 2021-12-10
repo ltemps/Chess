@@ -8,7 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(readr, readxl, dplyr, tidyverse, ggplot2, lmerTest, gvlma)
+pacman::p_load(readr, readxl, dplyr, tidyverse, ggplot2, lmerTest, gvlma, plotly)
 ```
 
 ## Abstract
@@ -28,7 +28,7 @@ I use multilevel models to examine the affects that an opening move has on a che
 
 ### Data Cleaning and Processing
 
-The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. First, I removed columns that were not of interest to my analysis. Second, I filtered the matches by time to only include those classified as bullet (<= 179s) or blitz (<= 479s), using dplyr. Third, I filtered the matches by player Elo rating, keeping only those where both partner had a rating of at least 2000. This Elo rating is categorized as a strong expert and is in the highest tier. Lastly, I removed matches that ended in a draw. The cleaned data set contains 310,734 observations of 8 variables.
+The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I then filtered the matches by time to only include those classified as bullet (<= 179s) or blitz (<= 479s), using dplyr. I kept only where both partner had a rating of at least 2000. This Elo rating is categorized as a strong expert and is in the highest tier. At this point in my data cleaning there existed 2,510 unique opening moves. I decided to simplify the opening move by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remain 296 unique moves. I created a table (insert table number) to examine the frequency at which they occur and selected the top ten for analysis. The cleaned data set contains 162,937 observations of 8 variables.
 
 Definition of columns:
 
@@ -45,6 +45,12 @@ Definition of columns:
 
 *Elo is a rating system that measures the relative strength of a player
 ** Time Control is calculated as InitialTime+ 40*Increment and has 
+
+```{r}
+open_plot <- ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..))
+#change orientation of labels
+```
+
 
 ```{r}
 ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
