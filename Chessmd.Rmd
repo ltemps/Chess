@@ -19,7 +19,7 @@ TODO:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
-pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, lmerTest, gvlma, ggplot2, plotly, gridExtra)
+pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, lmerTest, gvlma, ggplot2, plotly, gridExtra, VGAM, nnet)
 ```
 
 ## Abstract
@@ -72,49 +72,77 @@ ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..)) +
 Figure 1 shows
 
 ```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
-  labs(title= "Opening move & Number of Moves", 
-       x= "Opening Move", y= "Number of Moves") +
+ggplot(Chess) + geom_col(aes(x= Opening, y= WhiteElo)) +
+  labs(title= "Opening move & White Elo Ranking", 
+       x= "Opening Move", y= "White Elo Rank") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 Figure 2 shows
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
+ggplot(Chess, aes(x= WhiteElo, y= Winner)) +
   geom_point(aes(color= Opening), alpha = 0.3) +
-  labs(title= "Opening move & Number of Moves", 
-       x= "White Elo Rating", y= "Number of Moves") +
+  labs(title= "Opening move & Match Winner", 
+       x= "White Elo Rating", y= "Winner") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
 
 ### Model Fitting (whichever model works name it 'fit')
 
+Goal: predict number of moves based on opening move and WhiteElo 
 
-Does opening move have an affect on the total number of moves? 
-Does the opening move have an affect on the TimeControl?
-Does WhiteElo have an affect on opening move choice?
+```{r}
+#m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
+m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + (1 | Opening:WhiteElo), Chess)
+#Response- Number_of_Moves
+#Fixed Effects- Opening
+#Random Effects- WhiteElo (Complete Pooling?), Opening:WhiteElo interaction (Complete Pooling?)
 
-Does opening move have an affect on the number of moves?
-Control for the timecontrol?
-```{r, echo=FALSE}
-m_2 <- lmer(Number_of_Moves ~ Opening + (1 | TimeControl) + 
-              (1 | Opening:TimeControl), Chess)
-confint(m_2)
-coef(m_2)
-summary(m_2)
-```
-
-```{r, echo=FALSE}
-m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + 
-              (1 | Opening:WhiteElo), Chess)
-confint(m_3)
-coef(m_3)
 summary(m_3)
+#coef(m_3)
+#confint(m_3) #lower and upper bounds
 ```
+
+
+Below we see the fixed effects, ____ variables are significant at alpha = 0.05 level, etc.
+
+|                    |Estimate   |Std. Error  |df        |t value |Pr(>&#124;t&#124;) |
+|:---:               |:---:      |:---:       |:---:     |:---:   |:---:              |
+|(Intercept)         |39.6590    |0.1322      |2975.8553 |299.912 | < 2e-16 ***       |
+|English Opening     |0.4492     |0.1782      |2649.7683 |2.521   |0.011763 *         |
+|French Defense      |-0.4186    |0.1753      |2581.4494 |-2.387  |0.017049 *         |
+|Hungarian Opening   |0.6302     |0.1889      |2866.0539 |3.337   |0.000859 ***       |
+|Modern Defense      |-0.4341    |0.1952      |4067.3991 |-2.224  |0.026211 *         |
+|Nimzo-Larsen Attack |0.2279     |0.2036      |3192.6362 |1.120   |0.262973           |
+|Queen's Pawn Game   |0.3518     |0.2000      |4402.1877 |1.759   |0.078679 .         |
+|Scandinavian Defense|-0.7048    |0.1989      |4497.1876 |-3.543  |0.000400 ***       |
+|Sicilian Defense    |-0.3649    |0.1543      |1396.8587 |-2.365  |0.018188 *         |
+|Zukertort Opening   |0.4473     |0.1920      |4347.5291 |2.330   |0.019839 *         |
+
+
+
+
 
 ## Results
 
 ## Model Coefficients
+
+### Model Validation
+
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Residual plot and Q-Q plot."}
+binnedplot(fitted(m_2),resid(m_2))
+re <- plot(m_2)
+qq <- qqmath(m_2)
+grid.arrange(re,qq,nrow=1)
+```
+
+```{r echo=FALSE, fig.height=2, fig.width=4, fig.cap="Residuals vs Leverage."}
+ggplot(data.frame(lev=hatvalues(m_2),pearson=residuals(m_2,type="pearson")),
+      aes(x=lev,y=pearson)) +
+    geom_point() +
+    theme_bw()
+```
+
 
 ## Discussion
 
