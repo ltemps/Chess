@@ -1,19 +1,30 @@
 ---
-title: "The impact of Opening Moves"
+title: "First Impressions"
+subtitle: "The Impact of Opening Move on a Chess Match"
 author: "Lauren Temple"
-date: "12/9/2021"
+date: "12/2021"
 output: 
   pdf_document: default
 ---
+TODO:
+- Choose a color for EDA graphs, keep consistent color for those variables
+- replace the placeholder information
+- write abstract
+- write introduction
+- choose graphs to show in EDA section and add description
+- model
+- results
+- discussion
+- conclusion
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, ggplot2, lmerTest, gvlma, plotly)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, lmerTest, gvlma, ggplot2, plotly, gridExtra)
 ```
 
 ## Abstract
 
-Chess is a strategy and tactic based board game played between two players. It is one of the world's most popular games and is played by millions of people worldwide. The opening move is a topic that has books devoted to it and names for each particular movement pattern. 
+Chess is a strategy and tactic based board game played between two players. It is one of the world's most popular games and is played by millions of people worldwide. The opening move is a topic that has books devoted to it and names for each particular movement pattern. What can we learn from opening moves? Can we predict the length of the match? The number of total moves? Can we use player Elo rating to predict the opening move that will be used?
 
 Raise the general question
 State how I addressed it and what the overall results are
@@ -58,6 +69,7 @@ ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..)) +
        x= "Opening Move", y= "Frequency") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
+Figure 1 shows
 
 ```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
 ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
@@ -65,6 +77,7 @@ ggplot(Chess) + geom_col(aes(x= Opening, y= Number_of_Moves)) +
        x= "Opening Move", y= "Number of Moves") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
+Figure 2 shows
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
@@ -74,28 +87,96 @@ ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
 
-# Testing Models (remove title later)
+### Model Fitting (whichever model works name it 'fit')
+
+
 Does opening move have an affect on the total number of moves? 
 Does the opening move have an affect on the TimeControl?
 Does WhiteElo have an affect on opening move choice?
 
 Does opening move have an affect on the number of moves?
 Control for the timecontrol?
-```{r}
+```{r, echo=FALSE}
 m_2 <- lmer(Number_of_Moves ~ Opening + (1 | TimeControl) + 
               (1 | Opening:TimeControl), Chess)
+confint(m_2)
+coef(m_2)
 summary(m_2)
 ```
-```{r}
+
+```{r, echo=FALSE}
 m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + 
               (1 | Opening:WhiteElo), Chess)
+confint(m_3)
+coef(m_3)
 summary(m_3)
 ```
 
+## Results
 
+## Model Coefficients
 
+## Discussion
 
+issues with the model 
+
+## Conclusion
+
+summary of results
+
+limitations
+
+\newpage
 ## Citations
 
 Elo Rating System - Chess Terms. (n.d.). Chess.Com. https://www.chess.com/terms/elo-rating-chess
 Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikipedia.org/wiki/Chess
+
+\newpage
+## Appendix
+### More EDA
+```{r echo= FALSE, fig.cap= "Distribution plots for opening move, termination type, time control, White Elo rating, and number of moves"}
+p1 <- ggplot(data = Chess) + 
+  geom_bar(aes(x= Opening, y= ..count..)) +
+  labs(title= "Distribution of Opening Moves", x= "Opening Moves", y= "Frequency") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+p2 <- ggplot(data = Chess) + 
+  geom_bar(aes(x= Termination, y= ..count..)) +
+  labs(title = "Distribution of Termination \n Category",x = "Termination Category", 
+       y= "Frequency") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+p3 <- ggplot(data = Chess) + 
+  geom_bar(aes(x= TimeControl, y= ..count..)) +
+  labs(title = "Distribution of Time Control", x = "Time Control Category", y= "Frequency")
+
+p4 <- ggplot(data = Chess) + 
+  geom_bar(aes(x= Number_of_Moves, y= ..count..)) +
+  labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
+
+p5 <- ggplot(data = Chess) + 
+  geom_bar(aes(x= WhiteElo, y= ..count..)) +
+  labs(title = "Distribution of WhiteElo", x = "WhiteElo", y= "Frequency")
+
+p1
+p4
+grid.arrange(p2, p3, ncol=2)
+p5
+```
+
+\newpage
+### Full Results
+Random effects of model
+```{r echo=FALSE}
+ranef(fit)
+```
+Fixed effects of model
+```{r echo=FALSE}
+fixef(fit)
+```
+Coefficients of model
+```{r echo=FALSE}
+coef(fit)
+```
+

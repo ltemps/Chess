@@ -24,9 +24,13 @@ top_ten <- open_freq %>% dplyr::filter(open_freq$freq > 9000)
 #Subset data set to only include top ten opening moves
 Chess <- semi_join(Chess, top_ten, by = "Opening")
 
+#for visualization purposes
+Chess$Opening <- gsub(" ", "\n", Chess$Opening)
+Chess$Termination <- gsub(" ", "\n", Chess$Termination)
 
 # Questions: 
 # Does opening move have an affect on the total number of moves? 
 # Does the opening move have an affect on the TimeControl?
 # Does WhiteElo have an affect on opening move choice?
+
 
