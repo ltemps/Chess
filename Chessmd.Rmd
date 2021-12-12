@@ -128,33 +128,24 @@ Scicilian Defense
 $$Avg Number Of Moves= 18.44 + 0.0087\cdot (WhiteElo)$$
 Van't Kruijs Opening
 $$Avg Number Of Moves= 6.31 + 0.015\cdot (WhiteElo)$$
+Interpret the coefficients
+
+Compare the difference between opening moves
+
 
 ### Model Validation
 
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Figure X. Binned residual plot to assess the overall fit of the model"}
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure X"}
 binnedplot(fitted(fit),resid(fit))
 ```
-The binned residual plot shows that a majority of residuals are between 2 and -2. The residuals are not randomly distributed across expected values as shown by the unequal dispersion and slight curving on the tail ends of expected values.
-
+The binned residual plot shows that the residuals are not randomly distributed, this is indicative that the fitted model does not accurately describe the data.
 
 ```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Figure X. Residual plot and Q-Q plot"}
 re <- plot(fit)
 qq <- qqmath(fit)
 grid.arrange(re,qq,nrow=1)
 ```
-From the Residual plot in Figure X we can see that the mean of residuals is greater than 0. 
-
-From the Q-Q plot in Figure X, we can see that from -2 to 2 a majority dots are on the line, outside of that range the standardized residuals stray from normal. 
-
-```{r echo=FALSE, fig.height=2, fig.width=4, fig.cap="Residuals vs Leverage."}
-ggplot(data.frame(lev= hatvalues(fit),pearson= residuals(fit,type="pearson")),
-      aes(x=lev,y=pearson)) +
-    geom_point() +
-    theme_bw()
-```
-
-
-
+Figure X shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line. These figures suggest that the model fit is not an accurate representation of the data.
 
 ## Discussion
 
@@ -163,6 +154,7 @@ issues with the model
 ## Conclusion
 
 summary of results
+nonlinear model?
 
 limitations
 
@@ -174,8 +166,8 @@ Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikiped
 
 \newpage
 ## Appendix
-### More EDA
-```{r echo= FALSE, fig.cap= "Distribution plots for opening move, termination type, time control, White Elo rating, and number of moves"}
+### Extended Exploratory Data Analysis
+```{r echo= FALSE, fig.cap= "Distribution plots for opening move, termination type, time control, and number of moves"}
 p1 <- ggplot(data = Chess) + 
   geom_bar(aes(x= Opening, y= ..count..)) +
   labs(title= "Distribution of Opening Moves", x= "Opening Moves", y= "Frequency") +
@@ -215,12 +207,18 @@ Random effects of model
 ```{r echo=FALSE}
 ranef(fit)
 ```
+
 Fixed effects of model
 ```{r echo=FALSE}
 fixef(fit)
 ```
-Coefficients of model
-```{r echo=FALSE}
-coef(fit)
+
+If you cant figure out how to interpret this delete it
+```{r echo=FALSE, fig.height=2, fig.width=4, fig.cap="Residuals vs Leverage."}
+ggplot(data.frame(lev= hatvalues(fit),pearson= residuals(fit,type="pearson")),
+      aes(x=lev,y=pearson)) +
+    geom_point() +
+    theme_bw()
 ```
+
 
