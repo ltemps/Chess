@@ -3,7 +3,7 @@ title: "First Impressions"
 subtitle: "The Impact of Opening Move and Player Elo on a Chess Match"
 author: "Lauren Temple"
 date: "12/2021"
-output: 
+output:
   pdf_document: default
 ---
 
@@ -18,7 +18,8 @@ Chess is a strategy and tactic based board game played between two players. It i
 
 ## Introduction
 
-In the game of chess, opening moves are thoughtfully chosen and often studied by avid players. The Elo rating system measures relative strength of an individual in a game compared to other players. The usage of this scored was officially adopted by the U.S. Chess Federation in 1960. Elo rating reflects the players results from previous rated games and calculated the probable outcome of a person's games against other players (Elo Rating System - Chess Terms). This report aims to use opening move choice as well as white player's Elo rating to predict the total number of moves in a chess match. Given that white makes the first move in chess, and thus initiates the opening moves, I chose to include white player Elo rating as a predictor in my analysis. I will begin with a discussion of my data cleaning and processing then move into key findings from my exploratory data analysis. I will then present my fitted model, results, and discuss how this model could be improved and utilized. 
+In the game of chess, opening moves are thoughtfully chosen and often studied by avid players. The Elo rating system measures relative strength of an individual in a game compared to other players. The usage of this scored was officially adopted by the U.S. Chess Federation in 1960. Elo rating reflects the players results from previous rated games and calculated the probable outcome of a person's games against other players (Elo Rating System - Chess Terms). This report aims to use opening move choice as well as white player's Elo rating to predict the total number of moves in a chess match. Given that white makes the first move in chess, and thus initiates the opening moves, I chose to include white player Elo rating as a predictor in my analysis. I will begin with a discussion of my data cleaning and processing then move into key findings from my exploratory data analysis. I will then present my fitted model, results, and discuss how this model could be improved and utilized.
+
 ## Methods
 
 ### Data Cleaning and Processing
@@ -29,10 +30,10 @@ The data set used in this report is published on [Kaggle: 15 Million Chess Games
 
 | Opening Move          | Frequency |
 | :--:                  | :-----    |
-| French Defense	      | 229792    |	
+| French Defense	      | 229792    |
 | Hungarian Opening	    | 166730  	|  		
 | Scandinavian Defense	| 152656	  |		
-| Sicilian Defense	    | 254428		|	
+| Sicilian Defense	    | 254428		|
 | Van't Kruijs Opening	| 144309	  |
 
 The table above shows the frequency of the top five opening moves in the data set. These five opening moves will be used as the fixed effects component of the model.
@@ -51,7 +52,7 @@ Definition of columns:
 | Number of Moves | Number of moves of the game|
 
 *Elo is a rating system that measures the relative strength of a player
-\n** Time Control is calculated as InitialTime+ 40*Increment and has 
+** Time Control is calculated as InitialTime+ 40*Increment and has
 
 ### Exploratory Data Analysis
 
@@ -61,30 +62,33 @@ source("Data_Wrangling.R")
 
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 1"}
-ggplot(data = Chess) + 
+ggplot(data = Chess) +
   geom_bar(aes(x= WhiteElo, y= ..count..), color= "skyblue") +
-  labs(title = "Distribution of White Elo Ranking", x = "WhiteElo", y= "Frequency") + 
+  labs(title = "Distribution of White Elo Ranking", x = "WhiteElo", y= "Frequency") +
   ylim (0, 2000) + xlim(500, 2750)
 ```
 
-Figure 1 displays the distribution of white player Elo ranking. The Elo ranking of white players appears normally distributed. 
+
+Figure 1 displays the distribution of white player Elo ranking. The Elo ranking of white players appears normally distributed.
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 2"}
-ggplot(data = Chess) + 
+ggplot(data = Chess) +
   geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
   labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
 ```
 
-Figure 2 displays the distribution of number of moves in a match. There is a concentration of matches at lower numbers of moves. This phenomenon prevents the distribution of number of moves from being normal. 
+
+Figure 2 displays the distribution of number of moves in a match. There is a concentration of matches at lower numbers of moves. This phenomenon prevents the distribution of number of moves from being normal.
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 3"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
-  labs(title= "Modeling Number of Moves", 
+  labs(title= "Modeling Number of Moves",
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE)
 ```
 
-Figure 3 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match. 
+
+Figure 3 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match.
 
 - I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
 
@@ -94,7 +98,7 @@ Figure 3 shows that the relationship between white Elo rating and total number o
 fit <- lmer(Number_of_Moves ~ WhiteElo + (1 + WhiteElo | Opening), Chess)
 summary(fit)
 ```
-I fit a multilevel model with white Elo as a fixed effect and opening move as a random effect. The fitted model allows the intercept and slope to vary to accurately reflect the exploratory findings in Figure 3. This model aim's to answer the question: Can you predict total number of moves in a chess match based on opening move and white player Elo? The fixed and random effect results are shown in the tables below. 
+I fit a multilevel model with white Elo as a fixed effect and opening move as a random effect. The fitted model allows the intercept and slope to vary to accurately reflect the exploratory findings in Figure 3. This model aim's to answer the question: Can you predict total number of moves in a chess match based on opening move and white player Elo? The fixed and random effect results are shown in the tables below.
 
 Fixed Effects
 
@@ -122,6 +126,7 @@ coef(fit)
 ```
 
 |                       |(Intercept) |White Elo   |
+|:---:                  |:---:       |:---:       |
 |French Defense         |17.875451   |0.008955364 |
 |Hungarian Opening      |12.375047   |0.012393894 |
 |Scandinavian Defense   |16.979537   |0.009353380 |
@@ -139,34 +144,38 @@ The intercept and slope of the fitted model vary depending on the opening move o
 
 ### Model Validation
 
-```{r echo= FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 4"}
+```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 4"}
 ggplot() + geom_point(aes(x= Chess$Number_of_Moves, y=fitted(fit)), alpha= 1/10) + geom_abline(a= 0, b= 1) + labs(title= "Actual vs Predicted Number of Moves", x= "Actual Number of Moves", y= "Predicted Number of Moves")
 ```
 
-Figure 4 shows that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves. 
+
+Figure 4 shows that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves.
 
 ```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure 5"}
 binnedplot(fitted(fit),resid(fit))
 ```
 
-Figure 5 shows that the residuals are not randomly distributed and many points fall outside of the confidence bands. 
 
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Figure 6. Residual plot and Q-Q plot"}
+Figure 5 shows that the residuals are not randomly distributed and many points fall outside of the confidence bands.
+
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure 6"}
 re <- plot(fit)
 qq <- qqmath(fit)
 grid.arrange(re,qq,nrow=1)
 ```
-Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line. 
+
+
+Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line.
 
 The residual plots in Figure 5 and Figure 6 indicate that the fitted model is not an accurate representation of the data.
 
 ## Discussion
 
-The distribution of number of moves in a match raises concern about the validity of the model fitted. Figure 2 shows that there is a higher density of number of moves around matches with lower numbers of moves. The skewed distribution of number of moves contributes to the deviation from the standard normal line as well as the uneven distribution of residual vs fitted values that can be seen in Figure 6. Figure 5 shows notable curvature and many points that fall outside of the confidence band. It would not be valid to use this model to predict the number of moves in a chess match based on opening move and white Elo rating. 
+The distribution of number of moves in a match raises concern about the validity of the model fitted. Figure 2 shows that there is a higher density of number of moves around matches with lower numbers of moves. The skewed distribution of number of moves contributes to the deviation from the standard normal line as well as the uneven distribution of residual vs fitted values that can be seen in Figure 6. Figure 5 shows notable curvature and many points that fall outside of the confidence band. It would not be valid to use this model to predict the number of moves in a chess match based on opening move and white Elo rating.
 
-The data cleaning and processing of the original data creates limitations on the use of the model discussed. The model discussed was not created from nor tested on data of matches belonging to categories of time control other than bullet (lasting 179 seconds or less). For this reason it should not be used to predict matches classified as other than bullet. 
+The data cleaning and processing of the original data creates limitations on the use of the model discussed. The model discussed was not created from nor tested on data of matches belonging to categories of time control other than bullet (lasting 179 seconds or less). For this reason it should not be used to predict matches classified as other than bullet.
 
-In an exploratory analysis of the distribution of number of moves across all time control categories (Figure 8, Appendix), the higher density around lower values still remains. In addition there exists an overall left skew of the distribution, with very few matches in the largest numbers of moves. This appears to be a phenomenon of the data set and not a consequence of sub-setting the data. It may accurately reflect the average number of moves in chess matches outside of the data set. This phenomenon should be explored before further analysis and model fitting is performed. 
+In an exploratory analysis of the distribution of number of moves across all time control categories (Figure 8, Appendix), the higher density around lower values still remains. In addition there exists an overall left skew of the distribution, with very few matches in the largest numbers of moves. This appears to be a phenomenon of the data set and not a consequence of sub-setting the data. It may accurately reflect the average number of moves in chess matches outside of the data set. This phenomenon should be explored before further analysis and model fitting is performed.
 
 ## Conclusion
 
@@ -185,20 +194,22 @@ Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikiped
 ```{r, echo=FALSE, fig.height=4, fig.width= 10, fig.cap="Figure 7"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_point(alpha = 0.1) +
-  labs(title= "Modeling Number of Moves", 
+  labs(title= "Modeling Number of Moves",
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
 
+
 Figure 7 shows identical information to that of Figure 3, with the addition of points for each match in the data set.
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 8"}
-ggplot(data = Chess_2014) + 
+ggplot(data = Chess_2014) +
   geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
   labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
 ```
 
-Figure 8 shows the distribution of number of moves for matches in  all time control categories that occurred during 2014. 
+
+Figure 8 shows the distribution of number of moves for matches in  all time control categories that occurred during 2014.
 
 ### Complete list of Formulas:
 
