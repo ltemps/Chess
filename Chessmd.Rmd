@@ -66,19 +66,24 @@ ggplot(data = Chess) +
 Figure 1 displays the distribution of white player Elo ranking. From this figure we can see that the Elo ranking of white players appears normally distributed. 
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 2"}
+ggplot(data = Chess) + 
+  geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
+  labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
+```
+Figure 2 displays the distribution of number of moves in a match. From this figure we can see that there is a concentration of matches at lower numbers of moves. This phenomenon prevents the distribution of number of moves from being normal. 
+
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 3"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   labs(title= "Modeling Number of Moves", 
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE)
 ```
-Figure 2 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match. 
+Figure 3 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match. 
 - I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
 
 ### Model Fitting
 
 ```{r, echo=FALSE}
-#fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
-#fit <- lmer(Number_of_Moves ~ WhiteElo + (1 | Opening), Chess)
 fit <- lmer(Number_of_Moves ~ WhiteElo + (1 + WhiteElo | Opening), Chess)
 summary(fit)
 ```
@@ -122,46 +127,37 @@ The intercept and slope of the fitted model vary with the opening move of the ma
 Hungarian Opening
 $$Avg Number Of Moves= 12.38 + 0.012\cdot (WhiteElo)$$
 
-The intercept and slope of the fitted model vary depending on the opening move of the match. This means that there are different coefficients to predict the average number of moves in a match depending on the opening move that is played. 
+The intercept and slope of the fitted model vary depending on the opening move of the match. This means that there are different coefficients to predict the average number of moves in a match depending on the opening move that is played.
 
 
 ### Model Validation
 
-```{r echo= FALSE}
-plot(fitted(fit), Chess$Number_of_Moves)
-abline(a=0,b=1)  ## 1-to-1 line
-```
-
-```{r echo= FALSE}
+```{r echo= FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 4"}
 ggplot() + geom_point(aes(x= Chess$Number_of_Moves, y=fitted(fit)), alpha= 1/10) + geom_abline(a= 0, b= 1) + labs(title= "Actual vs Predicted Number of Moves", x= "Actual Number of Moves", y= "Predicted Number of Moves")
 ```
-From this plot we can see that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves. 
+Figure 4 shows that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves. 
 
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure X"}
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure 5"}
 binnedplot(fitted(fit),resid(fit))
 ```
-The binned residual plot shows that the residuals are not randomly distributed, this is indicative that the fitted model does not accurately describe the data.
+Figure 5 a binned residual plot, shows that the residuals are not randomly distributed, this is indicative that the fitted model does not accurately describe the data.
 
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Figure X. Residual plot and Q-Q plot"}
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap="Figure 6. Residual plot and Q-Q plot"}
 re <- plot(fit)
 qq <- qqmath(fit)
 grid.arrange(re,qq,nrow=1)
 ```
-Figure X shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line. These figures suggest that the model fit is not an accurate representation of the data.
+Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line. These figures suggest that the model fit is not an accurate representation of the data.
 
 ## Discussion
 
-issues with the model 
+
+*density of number of moves, high density closer to zero
 
 ## Conclusion
 
 summary of results
 
-
-limitations
-inculsion of more opening moves?
-nonlinear model?
-density of number of moves, high density closer to zero
 
 \newpage
 ## Citations
@@ -188,12 +184,7 @@ p3 <- ggplot(data = Chess) +
   geom_bar(aes(x= TimeControl, y= ..count..)) +
   labs(title = "Distribution of Time Control", x = "Time Control Category", y= "Frequency")
 
-p4 <- ggplot(data = Chess) + 
-  geom_bar(aes(x= Number_of_Moves, y= ..count..)) +
-  labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
-
 p1
-p4
 grid.arrange(p2, p3, ncol=2)
 ```
 
