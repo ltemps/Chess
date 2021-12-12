@@ -151,10 +151,13 @@ Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitte
 
 ## Discussion
 
-The model discussed above 
-The distribution of number of moves in a match (Figure 2) raises concern about the validity of the model fitted. I do not think that it would be accurate to use this model to predict the number of moves in a chess match based on opening move and white Elo rating. Additionally the subsetting of the original data set limits the use of this model to matches that are considered bullet, lasting 179 seconds or less. The model discussed was not created from nor tested on data of matches belonging to other categories of time control. For this reason it should not be used to predict matches classified as other than bullet. In an exp
+The distribution of number of moves in a match (Figure 2) raises concern about the validity of the model fitted. I do not think that it would be accurate to use this model to predict the number of moves in a chess match based on opening move and white Elo rating. Additionally the sub-setting of the original data set limits the use of this model to matches that are considered bullet, lasting 179 seconds or less. The model discussed was not created from nor tested on data of matches belonging to other categories of time control. For this reason it should not be used to predict matches classified as other than bullet. In an exploratory analysis of the distribution of number of moves across all time control categories (Figure 8, Appendix), the higher density around lower values still remains. In addition there exists an overall left skew of the distribution, with very few matches in the largest numbers of moves. This appears to be a phenomenon of the data set and not a consequence of sub-setting the data. It may accurately reflect the average number of moves in chess matches outside of the data set. This phenomenon should be explored before further analysis and model fitting is performed. 
 
-In order to improve this model I believe that it should be refit with matches of all time control categories. 
+The skewed distribution of number of moves contributes to the deviation from the standard normal line as well as the uneven distribution of residual vs fitted values that can be seen in Figure 6. From Figure 5 we can conclude that the fitted model is not an accurate representation of the data. There is notable curvature and many points that fall outside of (-2, 2). I hypothesize that the residuals from the fitted model would be improved if the distribution of number of moves was not as skewed. 
+
+## Conclusion
+
+In this report I fit a model using opening move choice as well as white player's Elo rating to predict the total number of moves in a chess match. The model fitted is not valid due to the uneven distribution of number of moves. At this time I caution the use of the above model and encourage further research into the distribution of number of moves.  
 
 \newpage
 ## Citations
