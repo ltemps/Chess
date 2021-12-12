@@ -39,20 +39,20 @@ I use multilevel models to examine the affects that an opening move has on a che
 
 ### Data Cleaning and Processing
 
-The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I then filtered the matches by time to only include those classified as bullet (<= 179s) or blitz (<= 479s), using dplyr. I kept only where both partner had a rating of at least 2000. This Elo rating is categorized as a strong expert and is in the highest tier. At this point in my data cleaning there existed 2,510 unique opening moves. I decided to simplify the opening move by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remain 296 unique moves. I created a table (insert table number) to examine the frequency at which they occur and selected the top ten for analysis. The cleaned data set contains 162,937 observations of 8 variables.
+The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I kept only matches that ocurred in 2014 so that I had one full year of data. I then filtered the matches by time to only include those classified as bullet (<= 179s), this is the second fastest time classification. The fastest time control category is ultrabullet (<= 29s), however it does not occur in this data set. At this point in my data cleaning there existed over two thousand unique opening moves. I decided to simplify the opening move column entries by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remained hundreds of unique moves. I created a table (insert figure number) to examine the frequency at which they occur and selected the top five for analysis. The cleaned data set contains 947,915 observations of 8 variables.
 
 Definition of columns:
 
-| column names      | explanation |
-| :--:              | :----- |
-| WhiteElo          | Elo* of the player with white pieces|
-| BlackElo          | Elo* of the player with black pieces |
-| Winner            | Color of the winning pieces |
-| Termination       | How the game ended, it can be: Normal, Time Forfeit, Abandon or Rules infraction |
-| Year              | Year when the game was played |
-| TimeControl       | Classification of the games based on the estimated duration of a game|
-| Opening           | Opening Move Name|
-| Number of Moves   | Number of moves of the game|
+| Column Name     | Description |
+| :--:            | :----- |
+| WhiteElo        | Elo* of the player with white pieces|
+| BlackElo        | Elo* of the player with black pieces |
+| Winner          | Color of the winning pieces |
+| Termination     | How the game ended, it can be: Normal, Time Forfeit, Abandon or Rules infraction |
+| Year            | Year when the game was played |
+| TimeControl     | Classification of the games based on the estimated duration of a game|
+| Opening         | Opening Move Name|
+| Number of Moves | Number of moves of the game|
 
 *Elo is a rating system that measures the relative strength of a player
 ** Time Control is calculated as InitialTime+ 40*Increment and has 
@@ -64,10 +64,7 @@ source("Data_Wrangling.R")
 ```
 
 ```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-ggplot(Chess) + geom_bar(aes(x= Opening, y= ..count..)) +
-  labs(title= "Opening move Frequency", 
-       x= "Opening Move", y= "Frequency") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+tibble(top_five)
 ```
 Figure 1 shows
 

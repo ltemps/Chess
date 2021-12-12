@@ -9,30 +9,19 @@ Chess <- Chess [-c(3,4,7,8,9,11,12,15)]
 Chess <- filter(Chess, Year == 2014)
 #subset down to the fastest games
 Chess <- filter(Chess, TimeControl == "Bullet")
-#filter for rating > 2000
 
 #Simplify Opening Move
 Open <- str_split_fixed(Chess$Opening, ":", 2)
 Open1 <- Open [ ,(1)]
 Chess$Opening <- Open1
-#Look at which openings are most frequently occuring in the data set
+#Look at which openings are most frequently occurring in the data set
 open_freq <- tibble(count(Chess, 'Opening'))
-#Choose to do analysis on the top ten
-#top_ten <- open_freq %>% dplyr::filter(open_freq$freq > 9000) #original
-top_five <- open_freq %>% dplyr::filter(open_freq$freq > 460000)
-#top_ten <- tibble(count(Chess, 'Opening')) %>% filter(freq >= 9000)
-#Subset data set to only include top ten opening moves
+#Table of top five and frequency
+top_five <- open_freq %>% dplyr::filter(open_freq$freq > 144000)
+
+#Subset data set to only include top five opening moves
 Chess <- semi_join(Chess, top_five, by = "Opening")
 
 #for visualization purposes
 Chess$Opening <- gsub(" ", "\n", Chess$Opening)
 Chess$Termination <- gsub(" ", "\n", Chess$Termination)
-
-#Chess$Winner <- ifelse(Chess$Winner == "White", 0, 1)
-
-# Questions: 
-# Does opening move have an affect on the total number of moves? 
-# Does the opening move have an affect on the TimeControl?
-# Does WhiteElo have an affect on opening move choice?
-
-
