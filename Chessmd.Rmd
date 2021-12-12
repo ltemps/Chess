@@ -26,7 +26,7 @@ In the game of chess, opening moves are thoughtfully chosen and often studied by
 
 The data set used in this report is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I kept only matches that occurred in 2014 so that I had one full year of data. I then filtered the matches by time to only include those classified as bullet (<= 179s), this is the second fastest time classification. The fastest time control category is ultrabullet (<= 29s), however it does not occur in this data set. At this point in my data cleaning there existed over two thousand unique opening moves. I decided to simplify the opening move column entries by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remained hundreds of unique moves. I created a table, shown below, to examine the frequency at which they occur and selected the top five for analysis. The cleaned data set contains 947,915 observations of 8 variables.
 
-\nextpage
+\newpage
 
 | Opening Move          | Frequency |
 | :--:                  | :-----    |
@@ -36,7 +36,7 @@ The data set used in this report is published on [Kaggle: 15 Million Chess Games
 | Sicilian Defense	    | 254428		|
 | Van't Kruijs Opening	| 144309	  |
 
-The table above shows the frequency of the top five opening moves in the data set. These five opening moves will be used as the fixed effects component of the model.
+The table above shows the frequency of the top five opening moves in the data set.
 
 Definition of columns:
 
@@ -52,7 +52,7 @@ Definition of columns:
 | Number of Moves | Number of moves of the game|
 
 *Elo is a rating system that measures the relative strength of a player
-** Time Control is calculated as InitialTime+ 40*Increment and has
+** Time Control is calculated as InitialTime + 40*Increment and has
 
 ### Exploratory Data Analysis
 
@@ -61,7 +61,7 @@ source("Data_Wrangling.R")
 ```
 
 
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 1"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10, fig.cap= "This graph displays the distribution of white player Elo ranking. The Elo ranking of white players appears normally distributed."}
 ggplot(data = Chess) +
   geom_bar(aes(x= WhiteElo, y= ..count..), color= "skyblue") +
   labs(title = "Distribution of White Elo Ranking", x = "WhiteElo", y= "Frequency") +
@@ -69,28 +69,20 @@ ggplot(data = Chess) +
 ```
 
 
-Figure 1 displays the distribution of white player Elo ranking. The Elo ranking of white players appears normally distributed.
-
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 2"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "This graph displays the distribution of number of moves in a match. There is a concentration of matches at lower numbers of moves. This phenomenon prevents the distribution of number of moves from being normal."}
 ggplot(data = Chess) +
   geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
   labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
 ```
 
 
-Figure 2 displays the distribution of number of moves in a match. There is a concentration of matches at lower numbers of moves. This phenomenon prevents the distribution of number of moves from being normal.
-
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 3"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "This graph shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This also shows that as white Elo rating increases so does the total number of moves in a match."}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   labs(title= "Modeling Number of Moves",
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE)
 ```
 
-
-Figure 3 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match.
-
-- I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
 
 ### Model Fitting
 
@@ -144,28 +136,22 @@ The intercept and slope of the fitted model vary depending on the opening move o
 
 ### Model Validation
 
-```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 4"}
+```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "This graph shows that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves."}
 ggplot() + geom_point(aes(x= Chess$Number_of_Moves, y=fitted(fit)), alpha= 1/10) + geom_abline(a= 0, b= 1) + labs(title= "Actual vs Predicted Number of Moves", x= "Actual Number of Moves", y= "Predicted Number of Moves")
 ```
 
 
-Figure 4 shows that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves.
-
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure 5"}
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "This graph shows that the residuals are not randomly distributed and many points fall outside of the confidence bands."}
 binnedplot(fitted(fit),resid(fit))
 ```
 
 
-Figure 5 shows that the residuals are not randomly distributed and many points fall outside of the confidence bands.
-
-```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure 6"}
+```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Theis figure shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line."}
 re <- plot(fit)
 qq <- qqmath(fit)
 grid.arrange(re,qq,nrow=1)
 ```
 
-
-Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitted values shows that the mean of residuals is not zero. There is a non-random distribution of residuals as shown by the flat edge of the negative points. The Q-Q plot shows deviation from the standard normal line.
 
 The residual plots in Figure 5 and Figure 6 indicate that the fitted model is not an accurate representation of the data.
 
@@ -191,7 +177,7 @@ Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikiped
 
 ### Additional Figures
 
-```{r, echo=FALSE, fig.height=4, fig.width= 10, fig.cap="Figure 7"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10, fig.cap="This graph shows identical information to that of Figure 3, with the addition of points for each match in the data set."}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_point(alpha = 0.1) +
   labs(title= "Modeling Number of Moves",
@@ -200,16 +186,8 @@ ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
 ```
 
 
-Figure 7 shows identical information to that of Figure 3, with the addition of points for each match in the data set.
+![Figure 8: This graph shows the distribution of number of moves for matches in  all time control categories that occurred during 2014](Fig8.png){width=50%}
 
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 8"}
-ggplot(data = Chess_2014) +
-  geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
-  labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
-```
-
-
-Figure 8 shows the distribution of number of moves for matches in  all time control categories that occurred during 2014.
 
 ### Complete list of Formulas:
 
