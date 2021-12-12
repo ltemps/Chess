@@ -186,7 +186,8 @@ ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
 ```
 
 
-![Figure 8: This graph shows the distribution of number of moves for matches in  all time control categories that occurred during 2014](Fig8.png){width=50%}
+
+![Figure 8: This graph shows the distribution of number of moves for matches in  all time control categories that occurred during 2014](Fig8.png){width=100%}
 
 
 ### Complete list of Formulas:
