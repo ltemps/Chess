@@ -80,10 +80,10 @@ ggplot(Chess) + geom_col(aes(x= Opening, y= WhiteElo)) +
 Figure 2 shows
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-ggplot(Chess, aes(x= WhiteElo, y= Winner)) +
+ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_point(aes(color= Opening), alpha = 0.3) +
-  labs(title= "Opening move & Match Winner", 
-       x= "White Elo Rating", y= "Winner") +
+  labs(title= "Modeling Number of Moves", 
+       x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
 
@@ -95,26 +95,26 @@ Fixed Effects- Opening
 Random Effects- WhiteElo (Complete Pooling?), Opening:WhiteElo interaction (Complete Pooling?)
 
 ```{r, echo=FALSE}
-#m_3 <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
+fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
 #fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + (1 | Opening:WhiteElo), Chess)
 
-summary(fit)
+#summary(fit)
 #coef(fit)
 #confint(fit) #lower and upper bounds
 ```
 Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
-Formula: Number_of_Moves ~ Opening + (1 | WhiteElo) + (1 | Opening:WhiteElo)
+Formula: Number_of_Moves ~ Opening + (1 | WhiteElo)
    Data: Chess
 
 Fixed Effects
 
 |                     |Estimate   |Std. Error  |df         |t value |Pr(>&#124;t&#124;) |
 |:---:                |:---:      |:---:       |:---:      |:---:   |:---:              |
-|(Intercept)          |32.30172   |0.13309     |1474.54429 |242.698 | < 2e-16 ***       |
-|King's Pawn Game     |-2.05280   |0.06301     |6231.87808 |-32.578 | < 2e-16 ***       |
-|Queen's Pawn Game    |-0.04482   |0.05724     |4679.54794 |-0.783  |0.434              |
-|Scandinavian Defense |-0.29377   |0.05319     |3402.55083 |-5.524  |3.57e-08 ***       |
-|Sicilian Defense     |0.29543    |0.04779     |2383.24660 |6.182   |7.42e-10 ***       |
+|(Intercept)          |32.32      |0.1322      |1,439      |244.425 | < 2e-16 ***       |
+|King's Pawn Game     |-2.085     |0.05750     |834,500    |-36.250 | < 2e-16 ***       |
+|Queen's Pawn Game    |-0.07868   |0.05143     |833,400    |-1.530  |0.126              |
+|Scandinavian Defense |-0.2646    |0.04678     |833,300    |-5.656  |1.55e-08 ***       |
+|Sicilian Defense     |0.2625     |0.04080     |833,400    |6.434   |1.25e-10 ***       |
 
 All of the top five opening moves, except for the Queen's Pawn Game, are significant at alpha = 0.05 level.
 
@@ -122,11 +122,10 @@ Random Effects
 
 |Groups               |Name       |Variance |Std.Dev. |
 |:---:                |:---:      |:---:    |:---:    |
-|Opening:WhiteElo     |(Intercept)|0.278    |  0.5273 |
-|WhiteElo             |(Intercept)|26.901   |5.1867   |
-|Residual             |           |200.048  |14.1438  |
+|WhiteElo             |(Intercept)|26.95    |5.191    |
+|Residual             |           |200.27   |14.152   |
 
-Number of obs: 835175, groups:  Opening:WhiteElo, 8696; WhiteElo, 1962
+Number of obs: 835175, groups:  WhiteElo, 1962
 
 ## Results
 
