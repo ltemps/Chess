@@ -23,7 +23,7 @@ In the game of chess, opening moves are thoughtfully chosen and often studied by
 
 ### Data Cleaning and Processing
 
-The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I kept only matches that ocurred in 2014 so that I had one full year of data. I then filtered the matches by time to only include those classified as bullet (<= 179s), this is the second fastest time classification. The fastest time control category is ultrabullet (<= 29s), however it does not occur in this data set. At this point in my data cleaning there existed over two thousand unique opening moves. I decided to simplify the opening move column entries by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remained hundreds of unique moves. I created a table (insert figure number) to examine the frequency at which they occur and selected the top five for analysis. The cleaned data set contains 947,915 observations of 8 variables.
+The data set is published on [Kaggle: 15 Million Chess Games from Lichess (2013-2014)](https://www.kaggle.com/maca11/chess-games-from-lichess-20132014?select=Lichess_2013_2014_Complete.csv). This data set contains 14,918,230 observations, each representing a different chess match. I began by removing columns that were not of interest to my analysis. I kept only matches that occurred in 2014 so that I had one full year of data. I then filtered the matches by time to only include those classified as bullet (<= 179s), this is the second fastest time classification. The fastest time control category is ultrabullet (<= 29s), however it does not occur in this data set. At this point in my data cleaning there existed over two thousand unique opening moves. I decided to simplify the opening move column entries by keeping only the first segment of its description. For example if the opening move entry was "Scandinavian Defense: Modern Variation, Gipslis Variation" that entry would simply be "Scandinavian Defense". After simplifying the opening move there still remained hundreds of unique moves. I created a table (insert figure number) to examine the frequency at which they occur and selected the top five for analysis. The cleaned data set contains 947,915 observations of 8 variables.
 
 Definition of columns:
 
@@ -69,47 +69,65 @@ Figure 1 displays the distribution of white player Elo ranking. From this figure
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   labs(title= "Modeling Number of Moves", 
        x= "White Elo Rating", y= "Number_of_Moves") +
-  geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
+  geom_smooth(aes(color= Opening), method = "lm", se=FALSE)
 ```
-Figure 2 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
+Figure 2 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. This figure also shows that as white Elo rating increases so does the total number of moves in a match. 
+- I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
 
 ### Model Fitting
 
 ```{r, echo=FALSE}
-fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
-
-#summary(fit)
-#coef(fit)
-#confint(fit) #lower and upper bounds
+#fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
+#fit <- lmer(Number_of_Moves ~ WhiteElo + (1 | Opening), Chess)
+fit <- lmer(Number_of_Moves ~ WhiteElo + (1 + WhiteElo | Opening), Chess)
+summary(fit)
 ```
-Linear mixed model fit by REML. t-tests use Satterthwaite's method ['lmerModLmerTest']
-Formula: Number_of_Moves ~ Opening + (1 | WhiteElo)
-   Data: Chess
+I fit a multilevel model to answer the question: Can you predict total number of moves in a chess match based on opening move and white player Elo? I used total number of moves as my response variable, with opening move as a fixed effect and white player Elo as a random effect. The fixed and random effect results are shown in the tables below. 
 
 Fixed Effects
 
-|                     |Estimate   |Std. Error  |df         |t value |Pr(>&#124;t&#124;) |
-|:---:                |:---:      |:---:       |:---:      |:---:   |:---:              |
-|(Intercept)          |32.32      |0.1322      |1,439      |244.425 | < 2e-16 ***       |
-|King's Pawn Game     |-2.085     |0.05750     |834,500    |-36.250 | < 2e-16 ***       |
-|Queen's Pawn Game    |-0.07868   |0.05143     |833,400    |-1.530  |0.126              |
-|Scandinavian Defense |-0.2646    |0.04678     |833,300    |-5.656  |1.55e-08 ***       |
-|Sicilian Defense     |0.2625     |0.04080     |833,400    |6.434   |1.25e-10 ***       |
+|             |Estimate   |Std. Error  |df         |t value |Pr(>&#124;t&#124;) |
+|:---:        |:---:      |:---:       |:---:      |:---:   |:---:              |
+|(Intercept)  |14.40      |9.326       |93,2500    |1.544   |0.12269            |
+|White Elo    |1.082e-02  |1.220e-03   |3.735      |8.863   |0.00122 **         |
 
-All of the top five opening moves, except for the Queen's Pawn Game, are significant at alpha = 0.05 level.
 
 Random Effects
 
-|Groups               |Name       |Variance |Std.Dev. |
-|:---:                |:---:      |:---:    |:---:    |
-|WhiteElo             |(Intercept)|26.95    |5.191    |
-|Residual             |           |200.27   |14.152   |
+|Groups               |Name       |Variance  |Std.Dev. |Corr  |
+|:---:                |:---:      |:---:     |:---:    |      |
+|Opening              |(Intercept)|434.8     |20.85    |      |
+|                     |White Elo  |7.428e-06 |0.0027   |-0.32 |
+|Residual             |           |208.9     |14.45    |      |
 
-Number of obs: 835175, groups:  WhiteElo, 1962
 
 ## Results
 
 ## Model Coefficients
+
+```{r echo= FALSE}
+coef(fit)
+```
+
+|                       |(Intercept) |White Elo   |
+|French Defense         |17.875451   |0.008955364 |
+|Hungarian Opening      |12.375047   |0.012393894 |
+|Scandinavian Defense   |16.979537   |0.009353380 |
+|Sicilian Defense       |18.443912   |0.008764171 |
+|Van't Kruijs Opening   |6.304616    |0.014619699 |
+
+Given the model coefficients we can calculate the average number of moves in a match based on opening move and white player Elo.
+
+French Defense
+$$Avg Number Of Moves= 17.875 + 0.00895\cdot (WhiteElo)$$
+Hungarian Opening
+$$Avg Number Of Moves= 12.38 + 0.012\cdot (WhiteElo)$$
+Scandinavian Defense
+$$Avg Number Of Moves= 16.98 + 0.0093\cdot (WhiteElo)$$
+Scicilian Defense
+$$Avg Number Of Moves= 18.44 + 0.0087\cdot (WhiteElo)$$
+Van't Kruijs Opening
+$$Avg Number Of Moves= 6.31 + 0.015\cdot (WhiteElo)$$
 
 ### Model Validation
 
