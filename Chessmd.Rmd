@@ -8,14 +8,6 @@ output:
 ---
 TODO:
 - Choose a color for EDA graphs, keep consistent color for those variables
-- replace the placeholder information
-- write abstract
-- write introduction
-- choose graphs to show in EDA section and add description
-- model
-- results
-- discussion
-- conclusion
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
@@ -24,17 +16,11 @@ pacman::p_load(readr, readxl, tidyverse, plyr, dplyr, lmerTest, gvlma, ggplot2, 
 
 ## Abstract
 
-Chess is a strategy and tactic based board game played between two players. It is one of the world's most popular games and is played by millions of people worldwide. The opening move is a topic that has books devoted to it and names for each particular movement pattern. What can we learn from opening moves? Can we predict the length of the match? The number of total moves? Can we use player Elo rating to predict the opening move that will be used?
-
-Raise the general question
-State how I addressed it and what the overall results are
+Chess is a strategy and tactic based board game played between two players. It is one of the world's most popular games and is played by millions of people worldwide. The opening move of a match is a topic that has books devoted to it and names for each particular movement pattern. In this report we examine the top five most frequently used opening moves in the data set as well as player Elo rating to predict the total number of moves in a match. After fitting a multilevel model I found that (insert conclusion statement).
 
 ## Introduction
 
-introduce chess and the question at hand
-
-I use multilevel models to examine the affects that an opening move has on a chess match. This report aims to answer the following questions; does opening move have an affect on the total number of moves; does the opening move have an affect on the duration of the game; and does the Elo of the white player have an affect on opening move choice? 
-
+In the game of chess, opening moves are thoughtfully chosen and often studied by avid players. The Elo rating system measures relative strength of an individual in a game compared to other players. The usage of this scored was officially adopted by the U.S. Chess Federation in 1960. Elo rating reflects the players results from previous rated games and calculated the probable outcome of a person's games against other players (Elo Rating System - Chess Terms). This report aims to use opening move choice as well as white player's Elo rating to predict the total number of moves in a chess match. Given that white makes the first move in chess, and thus initiates the opening moves, I chose to include white player Elo rating as a predictor in my analysis. I will begin with a discussion of my data cleaning and processing then move into key findings from my exploratory data analysis. I will then present my fitted model, results, and discuss how this model could be improved and utilized. 
 ## Methods
 
 ### Data Cleaning and Processing
