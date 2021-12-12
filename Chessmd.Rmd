@@ -6,8 +6,6 @@ date: "12/2021"
 output: 
   pdf_document: default
 ---
-TODO:
-- Choose a color for EDA graphs, keep consistent color for those variables
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
@@ -49,37 +47,36 @@ Definition of columns:
 source("Data_Wrangling.R")
 ```
 
-```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-tibble(top_five)
-```
-Figure 1 shows
+| Opening Move          | Frequency |
+| :--:                  | :-----    |
+| French Defense	      | 229792    |	
+| Hungarian Opening	    | 166730  	|  		
+| Scandinavian Defense	| 152656	  |		
+| Sicilian Defense	    | 254428		|	
+| Van't Kruijs Opening	| 144309	  |
 
-```{r echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
-ggplot(Chess) + geom_col(aes(x= Opening, y= WhiteElo)) +
-  labs(title= "Opening move & White Elo Ranking", 
-       x= "Opening Move", y= "White Elo Rank") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-```
-Figure 2 shows
+The table above shows the frequency of the top five opening moves in the data set. These five opening moves will be used as the fixed effects component of the model.
 
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="caption of visualization"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 1"}
+ggplot(data = Chess) + 
+  geom_bar(aes(x= WhiteElo, y= ..count..), color= "skyblue") +
+  labs(title = "Distribution of White Elo Ranking", x = "WhiteElo", y= "Frequency") + 
+  ylim (0, 2000) + xlim(500, 2750)
+```
+Figure 1 displays the distribution of white player Elo ranking. From this figure we can see that the Elo ranking of white players appears normally distributed. 
+
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 2"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
-  geom_point(aes(color= Opening), alpha = 0.3) +
   labs(title= "Modeling Number of Moves", 
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
+Figure 2 shows that the relationship between white Elo rating and total number of moves has a varying slope and intercept when grouped by opening move. I have omitted points that would serve to represent each match due to the fact that there are almost 1 million matches in this data set.  
 
-### Model Fitting (whichever model works name it 'fit')
-
-Goal: predict number of moves based on opening move and WhiteElo 
-Response- Number_of_Moves
-Fixed Effects- Opening
-Random Effects- WhiteElo (Complete Pooling?), Opening:WhiteElo interaction (Complete Pooling?)
+### Model Fitting
 
 ```{r, echo=FALSE}
 fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo), Chess)
-#fit <- lmer(Number_of_Moves ~ Opening + (1 | WhiteElo) + (1 | Opening:WhiteElo), Chess)
 
 #summary(fit)
 #coef(fit)
@@ -180,19 +177,22 @@ p4 <- ggplot(data = Chess) +
   geom_bar(aes(x= Number_of_Moves, y= ..count..)) +
   labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
 
-p5 <- ggplot(data = Chess) + 
-  geom_bar(aes(x= WhiteElo, y= ..count..)) +
-  labs(title = "Distribution of WhiteElo", x = "WhiteElo", y= "Frequency") + 
-  ylim (0, 10000)
-
 p1
 p4
 grid.arrange(p2, p3, ncol=2)
-p5
 ```
 
 \newpage
 ### Full Results
+
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="Figure X"}
+ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
+  geom_point(alpha = 0.3) +
+  labs(title= "Modeling Number of Moves", 
+       x= "White Elo Rating", y= "Number_of_Moves") +
+  geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
+```
+
 Random effects of model
 ```{r echo=FALSE}
 ranef(fit)
