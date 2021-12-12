@@ -151,13 +151,10 @@ Figure 6 shows a Residual plot and a QQ plot. The plot of the residuals vs fitte
 
 ## Discussion
 
+The model discussed above 
+The distribution of number of moves in a match (Figure 2) raises concern about the validity of the model fitted. I do not think that it would be accurate to use this model to predict the number of moves in a chess match based on opening move and white Elo rating. Additionally the subsetting of the original data set limits the use of this model to matches that are considered bullet, lasting 179 seconds or less. The model discussed was not created from nor tested on data of matches belonging to other categories of time control. For this reason it should not be used to predict matches classified as other than bullet. In an exp
 
-*density of number of moves, high density closer to zero
-
-## Conclusion
-
-summary of results
-
+In order to improve this model I believe that it should be refit with matches of all time control categories. 
 
 \newpage
 ## Citations
@@ -167,37 +164,15 @@ Wikipedia contributors. (2021, December 2). Chess. Wikipedia. https://en.wikiped
 
 \newpage
 ## Appendix
-### Extended Exploratory Data Analysis
-```{r echo= FALSE, fig.cap= "Distribution plots for opening move, termination type, time control, and number of moves"}
-p1 <- ggplot(data = Chess) + 
-  geom_bar(aes(x= Opening, y= ..count..)) +
-  labs(title= "Distribution of Opening Moves", x= "Opening Moves", y= "Frequency") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-p2 <- ggplot(data = Chess) + 
-  geom_bar(aes(x= Termination, y= ..count..)) +
-  labs(title = "Distribution of Termination \n Category",x = "Termination Category", 
-       y= "Frequency") + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-p3 <- ggplot(data = Chess) + 
-  geom_bar(aes(x= TimeControl, y= ..count..)) +
-  labs(title = "Distribution of Time Control", x = "Time Control Category", y= "Frequency")
-
-p1
-grid.arrange(p2, p3, ncol=2)
-```
-
-\newpage
-### Full Results
-
-```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="Figure X"}
+```{r, echo=FALSE, fig.height=4, fig.width= 10, fig.cap="Figure 7"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
   geom_point(alpha = 0.1) +
   labs(title= "Modeling Number of Moves", 
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
 ```
+Figure 7 is in akin to Figure 3, the difference being that Figure 7 includes a point for each match in the data set.
 
 Random effects of model
 ```{r echo=FALSE}
@@ -207,14 +182,6 @@ ranef(fit)
 Fixed effects of model
 ```{r echo=FALSE}
 fixef(fit)
-```
-
-If you cant figure out how to interpret this delete it
-```{r echo=FALSE, fig.height=2, fig.width=4, fig.cap="Residuals vs Leverage."}
-ggplot(data.frame(lev= hatvalues(fit),pearson= residuals(fit,type="pearson")),
-      aes(x=lev,y=pearson)) +
-    geom_point() +
-    theme_bw()
 ```
 
 Complete list of Formulas:
@@ -229,3 +196,10 @@ Scicilian Defense
 $$Avg Number Of Moves= 18.44 + 0.0087\cdot (WhiteElo)$$
 Van't Kruijs Opening
 $$Avg Number Of Moves= 6.31 + 0.015\cdot (WhiteElo)$$
+
+```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap= "Figure 8"}
+ggplot(data = Chess_2014) + 
+  geom_bar(aes(x= Number_of_Moves, y= ..count..), color= "tomato") +
+  labs(title = "Distribution of Number of Moves", x = "Number of Moves", y= "Frequency")
+```
+
