@@ -82,7 +82,7 @@ Figure 2 shows that the relationship between white Elo rating and total number o
 fit <- lmer(Number_of_Moves ~ WhiteElo + (1 + WhiteElo | Opening), Chess)
 summary(fit)
 ```
-I fit a multilevel model to answer the question: Can you predict total number of moves in a chess match based on opening move and white player Elo? I used total number of moves as my response variable, with opening move as a fixed effect and white player Elo as a random effect. The fixed and random effect results are shown in the tables below. 
+I fit a multilevel model with white Elo as a fixed effect and opening move as a random effect, allowing the intercept and slope to vary. This model aim's to answer the question: Can you predict total number of moves in a chess match based on opening move and white player Elo? The fixed and random effect results are shown in the tables below. 
 
 Fixed Effects
 
@@ -116,24 +116,26 @@ coef(fit)
 |Sicilian Defense       |18.443912   |0.008764171 |
 |Van't Kruijs Opening   |6.304616    |0.014619699 |
 
-Given the model coefficients we can calculate the average number of moves in a match based on opening move and white player Elo.
 
-French Defense
-$$Avg Number Of Moves= 17.875 + 0.00895\cdot (WhiteElo)$$
+The intercept and slope of the fitted model vary with the opening move of the match. A match with the 'Hungarian Opening' as the opening move and a white player Elo rating of zero, meaning they are an unrated player, is predicted to have an average of 12.38 moves. A match with the 'Hungarian Opening' and a white player Elo rating of 2500, is predicted to have an average of 42.38 moves.
+
 Hungarian Opening
 $$Avg Number Of Moves= 12.38 + 0.012\cdot (WhiteElo)$$
-Scandinavian Defense
-$$Avg Number Of Moves= 16.98 + 0.0093\cdot (WhiteElo)$$
-Scicilian Defense
-$$Avg Number Of Moves= 18.44 + 0.0087\cdot (WhiteElo)$$
-Van't Kruijs Opening
-$$Avg Number Of Moves= 6.31 + 0.015\cdot (WhiteElo)$$
-Interpret the coefficients
 
-Compare the difference between opening moves
+The intercept and slope of the fitted model vary depending on the opening move of the match. This means that there are different coefficients to predict the average number of moves in a match depending on the opening move that is played. 
 
 
 ### Model Validation
+
+```{r echo= FALSE}
+plot(fitted(fit), Chess$Number_of_Moves)
+abline(a=0,b=1)  ## 1-to-1 line
+```
+
+```{r echo= FALSE}
+ggplot() + geom_point(aes(x= Chess$Number_of_Moves, y=fitted(fit)), alpha= 1/10) + geom_abline(a= 0, b= 1) + labs(title= "Actual vs Predicted Number of Moves", x= "Actual Number of Moves", y= "Predicted Number of Moves")
+```
+From this plot we can see that there is a higher density of matches that have a lower number of moves. The model appears to fits matches with lower number of moves better than those with a higher number of moves. 
 
 ```{r echo=FALSE, fig.height=2.5, fig.width=6, fig.cap= "Figure X"}
 binnedplot(fitted(fit),resid(fit))
@@ -154,9 +156,12 @@ issues with the model
 ## Conclusion
 
 summary of results
-nonlinear model?
+
 
 limitations
+inculsion of more opening moves?
+nonlinear model?
+density of number of moves, high density closer to zero
 
 \newpage
 ## Citations
@@ -197,7 +202,7 @@ grid.arrange(p2, p3, ncol=2)
 
 ```{r, echo=FALSE, fig.height=4, fig.width= 10,fig.cap="Figure X"}
 ggplot(Chess, aes(x= WhiteElo, y= Number_of_Moves)) +
-  geom_point(alpha = 0.3) +
+  geom_point(alpha = 0.1) +
   labs(title= "Modeling Number of Moves", 
        x= "White Elo Rating", y= "Number_of_Moves") +
   geom_smooth(aes(color= Opening), method = "lm", se=FALSE) + theme(legend.position="none")
@@ -221,4 +226,15 @@ ggplot(data.frame(lev= hatvalues(fit),pearson= residuals(fit,type="pearson")),
     theme_bw()
 ```
 
+Complete list of Formulas:
 
+French Defense
+$$Avg Number Of Moves= 17.875 + 0.00895\cdot (WhiteElo)$$
+Hungarian Opening
+$$Avg Number Of Moves= 12.38 + 0.012\cdot (WhiteElo)$$
+Scandinavian Defense
+$$Avg Number Of Moves= 16.98 + 0.0093\cdot (WhiteElo)$$
+Scicilian Defense
+$$Avg Number Of Moves= 18.44 + 0.0087\cdot (WhiteElo)$$
+Van't Kruijs Opening
+$$Avg Number Of Moves= 6.31 + 0.015\cdot (WhiteElo)$$
